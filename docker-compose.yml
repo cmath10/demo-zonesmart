@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  node: &node
+    image: node:20
+    user: node
+    volumes:
+      - ./:/project
+    working_dir: /project
+
+  dev:
+    <<: *node
+    command: 'yarn dev'
+    working_dir: /project/m3-react
+    labels:
+      traefik.port: 5173
+      traefik.enable: 'true'
+      traefik.http.routers.zs-demo.rule: 'HostRegexp(`zs.demo.{[^.]+}`)'
+      traefik.http.routers.zs-demo.priority: 1
+      traefik.http.routers.zs-demo.service: zs-demo
+      traefik.http.services.zs-demo.loadbalancer.server.port: '5173'
