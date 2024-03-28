@@ -1,15 +1,9 @@
 <template lang="pug">
-PageLogin
+RouterView
 </template>
 
 <script lang="ts">
-import PageLogin from '@/pages/PageLogin.vue'
-
 import { defineComponent } from 'vue'
 
-export default defineComponent({
-  components: {
-    PageLogin,
-  },
-})
+export default defineComponent({})
 </script>

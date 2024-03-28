@@ -17,6 +17,10 @@ export default new Store({
     refresh: null,
   }),
 
+  getters: {
+    is_authenticated: state => state.email !== null,
+  },
+
   mutations: {
     SET: (state, user: User) => {
       state.email = user.email

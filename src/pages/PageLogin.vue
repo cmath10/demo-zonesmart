@@ -48,6 +48,8 @@ import { defineComponent } from 'vue'
 import auth from '@/api/auth'
 
 export default defineComponent({
+  name: 'PageLogin',
+
   components: {
     VButton,
     VInput,
@@ -87,6 +89,7 @@ export default defineComponent({
           email: this.email,
           password: this.password,
         }))
+        await this.$router.push({ name: 'Home' })
       } catch (e: unknown) {
         if (e instanceof UnauthorizedHttpError) {
           this.error = e.message === 'No active account found with the given credentials'
