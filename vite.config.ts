@@ -6,7 +6,19 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [
     vue(),
-    svg(),
+    svg({
+      svgoConfig: {
+        multipass: true,
+        plugins: [{
+          name: 'preset-default',
+          params: {
+            overrides: {
+              removeViewBox: false,
+            },
+          },
+        }],
+      },
+    }),
   ],
 
   resolve: {

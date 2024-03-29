@@ -111,6 +111,7 @@ module.exports = {
     'vue/no-v-text-v-html-on-component': 'error',
     'vue/order-in-components': 'error',
     'vue/padding-line-between-blocks': 'error',
+    'vue/prop-name-casing': ['error', 'snake_case'],
     'vue/require-default-prop': 'error',
     'vue/require-prop-types': 'error',
     'vue/this-in-template': 'error',

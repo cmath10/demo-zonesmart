@@ -26,6 +26,8 @@ import type { PropType } from 'vue'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
+  name: 'VInput',
+
   props: {
     id: {
       type: null as PropType<string | null>,

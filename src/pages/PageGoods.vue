@@ -5,13 +5,23 @@ div
         href="javascript:void(0)"
         @click="logout"
     ) Выйти
+    div
+        VCheckbox(v-model:model="checked")
 </template>
 
 <script lang="ts">
+import VCheckbox from '@/components/VCheckbox.vue'
+
 import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'PageGoods',
+
+  components: {
+    VCheckbox,
+  },
+
+  data: () => ({ checked: false }),
 
   methods: {
     logout () {
