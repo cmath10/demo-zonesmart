@@ -8,14 +8,14 @@ services:
       - ./:/project
     working_dir: /project
 
-  dev:
+  serve:
     <<: *node
-    command: 'yarn dev'
-    working_dir: /project/m3-react
+    command: 'yarn serve'
+    working_dir: /project
     labels:
       traefik.port: 5173
       traefik.enable: 'true'
       traefik.http.routers.zs-demo.rule: 'HostRegexp(`zs.demo.{[^.]+}`)'
       traefik.http.routers.zs-demo.priority: 1
       traefik.http.routers.zs-demo.service: zs-demo
-      traefik.http.services.zs-demo.loadbalancer.server.port: '5173'
+      traefik.http.services.zs-demo.loadbalancer.server.port: 5173

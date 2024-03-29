@@ -59,16 +59,27 @@ export default defineComponent({
     email: '',
     password: '',
     error: '',
+    redirecting: false,
     submitting: false,
   }),
 
   computed: {
+    authenticated () {
+      return this.$store.getters.authenticated
+    },
+
     filled (): boolean {
       return this.email.length > 0 && this.password.length > 0
     },
   },
 
   watch: {
+    async authenticated () {
+      if (this.authenticated) {
+        await this.$router.push({ name: 'Home' })
+      }
+    },
+
     email () {
       this.error = ''
     },
@@ -85,11 +96,10 @@ export default defineComponent({
       this.submitting = true
 
       try {
-        this.$store.dispatch('SET', await auth({
+        this.$store.dispatch('SET_USER', await auth({
           email: this.email,
           password: this.password,
         }))
-        await this.$router.push({ name: 'Home' })
       } catch (e: unknown) {
         if (e instanceof UnauthorizedHttpError) {
           this.error = e.message === 'No active account found with the given credentials'
@@ -107,10 +117,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
+@import "../stylesheets/variables";
+
 .form {
   padding: 40px 40px 60px;
   flex-shrink: 0;
-  background: var(--zs-white, #FFF);
+  background: #{$zs-white};
   border-radius: 15px;
   box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.16);
 
@@ -132,6 +144,6 @@ export default defineComponent({
 }
 
 .error {
-  color: var(--zs-error, #FF1E1E)
+  color: #{$zs-red};
 }
 </style>

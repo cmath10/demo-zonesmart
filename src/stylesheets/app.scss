@@ -1,3 +1,5 @@
+@import "./variables";
+
 * {
   box-sizing: border-box;
 }
@@ -13,12 +15,12 @@
 }
 
 a {
-  color: var(--zs-green, #2ED2BA);
+  color: #{$zs-green};
   font-weight: 500;
   text-decoration: inherit;
 }
 a:hover {
-  color: #20EBCD;
+  color: #{$zs-green-saturated};
 }
 
 body {
@@ -29,13 +31,13 @@ body {
   background:
     linear-gradient(0deg, #F2F2F2 0%, #F2F2F2 100%),
     linear-gradient(0deg, rgba(30, 52, 71, 0.16) 0%, rgba(30, 52, 71, 0.16) 100%),
-    var(--zs-white, #FFF)
+    #{$zs-white}
   ;
   margin: 0;
 }
 
 h1 {
-  color: var(--zs-black, #000);
+  color: #{$zs-black};
   font-family: "Graphik LCG", sans-serif;
   font-size: 42px;
   font-style: normal;
@@ -52,7 +54,7 @@ h1 {
 }
 
 label {
-  color: var(--zs-gray, #999);
+  color: #{$zs-gray};
   font-family: "Graphik LCG", sans-serif;
   font-size: 12px;
   font-style: normal;

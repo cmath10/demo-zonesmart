@@ -28,7 +28,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-$zs-green: var(--zs-green, #2ED2BA);
+@import "../stylesheets/variables";
 
 .v-button {
   display: flex;
@@ -63,8 +63,8 @@ $zs-green: var(--zs-green, #2ED2BA);
   }
 
   &[disabled] {
-    background: var(--zs-button-gray, #F2F1F3);
-    color: var(--zs-gray, #999999);
+    background: #{$zs-gray-button};
+    color: #{$zs-gray};
     cursor: not-allowed;
   }
 }

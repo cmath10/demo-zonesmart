@@ -1,51 +1,55 @@
+import type {
+  ActionTree,
+  GetterTree,
+  MutationTree,
+} from 'vuex'
+
 import type { User } from '@/domain/user'
 
 import { Store } from 'vuex'
 
 import * as db from '@/db'
 
-type Nullable<T> = {
-  [P in keyof T]: T[P] | null;
+export type State = {
+  initialized: boolean;
+  user: User | null;
 }
 
-export type State = Nullable<User>
+export const state = (): State => ({
+  initialized: false,
+  user: null,
+})
+
+export const getters = {
+  authenticated: state => state.user !== null,
+  initialized: state => state.initialized,
+} satisfies GetterTree<State, unknown>
+
+export const mutations = {
+  SET_INITIALIZED: (state, initialized: boolean) => state.initialized = initialized,
+
+  SET_USER: (state, user: User) => state.user = user,
+
+  UNSET_USER: (state) => state.user = null,
+} satisfies MutationTree<State>
+
+export const actions = {
+  SET_USER: async ({ commit }, user: User) => {
+    commit('SET_USER', user)
+
+    await db.put(user)
+  },
+
+  UNSET_USER: async ({ commit }) => {
+    commit('UNSET_USER')
+
+    await db.clear()
+  },
+} satisfies ActionTree<State, unknown>
 
 export default new Store({
-  state: (): State => ({
-    email: null,
-    access: null,
-    refresh: null,
-  }),
-
-  getters: {
-    is_authenticated: state => state.email !== null,
-  },
-
-  mutations: {
-    SET: (state, user: User) => {
-      state.email = user.email
-      state.access = user.access
-      state.refresh = user.refresh
-    },
-
-    UNSET: (state) => {
-      state.email = null
-      state.access = null
-      state.refresh = null
-    },
-  },
-
-  actions: {
-    SET: async ({ state, commit }, user: User) => {
-      commit('SET', user)
-
-      await db.put(user)
-    },
-
-    UNSET: async ({ commit }) => {
-      commit('UNSET')
-
-      await db.clear()
-    },
-  },
+  state,
+  getters,
+  mutations,
+  actions,
 })

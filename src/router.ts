@@ -25,12 +25,18 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  console.log(store.getters.is_authenticated, to)
-  if (
-    !store.getters.is_authenticated &&
-    to.name !== 'Login'
-  ) {
-    return { name: 'Login' }
+  if (!store.getters.initialized) {
+    return
+  }
+
+  if (store.getters.authenticated) {
+    if (to.name === 'Login') {
+      return { name: 'Home' }
+    }
+  } else {
+    if (to.name !== 'Login') {
+      return { name: 'Login' }
+    }
   }
 })
 

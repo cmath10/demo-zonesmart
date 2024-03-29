@@ -79,18 +79,18 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-$dark-blue: var(--zs-dark-blue, #132639);
+@import "../stylesheets/variables";
 
 .v-input {
   display: inline-flex;
   padding: 12px 28px 13px 28px;
-  background: var(--zs-button-gray, #F2F1F3);
+  background: #{$zs-gray-button};
   border: 1px solid transparent;
   border-radius: 6px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.25) inset;
 
   &_focused {
-    border-color: #{$dark-blue};
+    border-color: #{$zs-blue-dark};
   }
 
   &__input {
@@ -99,7 +99,7 @@ $dark-blue: var(--zs-dark-blue, #132639);
     padding: 0;
     background: transparent;
     border: none;
-    color: var(--zs-black, #000000);
+    color: #{$zs-black};
     font-family: "Graphik LCG", sans-serif;
     font-size: 15px;
     font-style: normal;
@@ -108,7 +108,7 @@ $dark-blue: var(--zs-dark-blue, #132639);
     outline: none;
 
     &::placeholder {
-      color: var(--zs-gray, #999);
+      color: #{$zs-gray};
     }
   }
 }

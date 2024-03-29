@@ -1,6 +1,7 @@
 import type { User } from '@/domain/user'
 
 const store_name = 'credentials'
+const store_key = 'user'
 
 function openDb() {
   return new Promise<IDBDatabase>((resolve, reject) => {
@@ -9,7 +10,7 @@ function openDb() {
     request.onupgradeneeded = () => {
       const db: IDBDatabase = request.result
       if (!db.objectStoreNames.contains(store_name)) {
-        db.createObjectStore(store_name, { keyPath: 'email' })
+        db.createObjectStore(store_name, { autoIncrement: true })
       }
     }
 
@@ -18,16 +19,16 @@ function openDb() {
   })
 }
 
-export const get = async (email: string) => {
+export const get = async () => {
   const db = await openDb()
 
   const transaction = db.transaction(store_name, 'readonly')
   const store = transaction.objectStore(store_name)
 
-  const request = store.get(email)
+  const request = store.get(store_key)
 
-  return new Promise<User>((resolve, reject) => {
-    request.onsuccess = () => resolve(request.result)
+  return new Promise<User | null>((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result ?? null)
     request.onerror = reject
   })
 }
@@ -38,7 +39,9 @@ export const put = async (user: User) => {
   const transaction = db.transaction(store_name, 'readwrite')
   const store = transaction.objectStore(store_name)
 
-  store.put(user)
+  store.clear().onsuccess = () => {
+    store.put(user, store_key)
+  }
 
   return new Promise((resolve, reject) => {
     transaction.oncomplete = resolve
