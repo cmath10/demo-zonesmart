@@ -1,43 +1,54 @@
 <template lang="pug">
-form(
-    :class="$style['form']"
-    @submit="onSubmit"
-)
-    h1 Вход
+div(:class="$style['container']")
+    form.v-panel(@submit="onSubmit")
+        h1 Вход
 
-    div(:class="$style['form__field']")
-        label(for="email") Email
-        VInput(
-            id="email"
-            v-model:value="email"
-            :class="$style['input']"
-            :readonly="submitting"
-            placeholder="yourmail@mail.ru"
-        )
+        div(:class="$style['field']")
+            label(for="email") Email
+            VInput(
+                id="email"
+                v-model:value="email"
+                :class="$style['input']"
+                :readonly="submitting"
+                placeholder="yourmail@mail.ru"
+            )
 
-    div(:class="$style['form__field']")
-        label(for="password") Пароль
-        VInput(
-            id="password"
-            v-model:value="password"
-            type="password"
-            :class="$style['input']"
-            :readonly="submitting"
-            placeholder="Ваш пароль"
-        )
-        div(
-            v-if="error.length > 0"
-            :class="$style['error']"
-        ) {{ error }}
+        div(:class="$style['field']")
+            label(for="password") Пароль
+            VInput(
+                id="password"
+                v-model:value="password"
+                :type="password_hidden ? 'password' : 'text'"
+                :class="$style['input']"
+                :readonly="submitting"
+                placeholder="Ваш пароль"
+            )
+                template(#trailing)
+                    IconEye(
+                        v-if="password_hidden"
+                        :class="$style['icon-button']"
+                        @click="password_hidden = false"
+                    )
+                    IconEyeClosed(
+                        v-else
+                        :class="$style['icon-button']"
+                        @click="password_hidden = true"
+                    )
+            div(
+                v-if="error.length > 0"
+                :class="$style['error']"
+            ) {{ error }}
 
-    div(:class="$style['form__footer']")
-        VButton(
-            type="submit"
-            :disabled="!filled || submitting"
-        ) Вход
+        div(:class="$style['footer']")
+            VButton(
+                type="submit"
+                :disabled="!filled || submitting"
+            ) Вход
 </template>
 
 <script lang="ts">
+import IconEye from '@/sprites/icons/eye.svg'
+import IconEyeClosed from '@/sprites/icons/eye-closed.svg'
 import VButton from '@/components/VButton.vue'
 import VInput from '@/components/VInput.vue'
 
@@ -51,6 +62,8 @@ export default defineComponent({
   name: 'PageLogin',
 
   components: {
+    IconEye,
+    IconEyeClosed,
     VButton,
     VInput,
   },
@@ -58,6 +71,7 @@ export default defineComponent({
   data: () => ({
     email: '',
     password: '',
+    password_hidden: true,
     error: '',
     redirecting: false,
     submitting: false,
@@ -119,31 +133,40 @@ export default defineComponent({
 <style lang="scss" module>
 @import "../stylesheets/variables";
 
-.form {
-  padding: 40px 40px 60px;
-  flex-shrink: 0;
-  background: #{$zs-white};
-  border-radius: 15px;
-  box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.16);
+.container {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
-  &__field {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 350px;
-    margin-bottom: 20px;
-  }
-
-  &__footer {
-    margin-top: 40px;
-  }
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 350px;
+  margin-bottom: 20px;
 }
 
 .input {
   width: 100%;
 }
 
+.icon-button {
+  color: #{$zs-gray};
+  cursor: pointer;
+
+  &:hover {
+    color: #{$zs-black};
+  }
+}
+
 .error {
   color: #{$zs-red};
+}
+
+.footer {
+  margin-top: 40px;
 }
 </style>

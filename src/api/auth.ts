@@ -1,8 +1,7 @@
 import type { User } from '@/domain/user'
 
-import UnauthorizedHttpError from './UnauthorizedHttpError'
-
 import axios from 'axios'
+import processError from './processError'
 
 export default async (data: {
   email: string;
@@ -19,11 +18,6 @@ export default async (data: {
       ...response.data,
     }
   } catch (e: unknown) {
-    if (axios.isAxiosError(e)) {
-      if (e.response?.status === 401) {
-        throw new UnauthorizedHttpError(e.response.data.detail)
-      }
-    }
-    throw e
+    throw processError(e)
   }
 }

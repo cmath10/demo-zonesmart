@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+    <path
+        d="M6.5 7.5L10.5799 12.8447C10.846 13.1933 10.9902 13.6197 10.9902 14.0583V17.4902C10.9902 18.324 11.6662 19 12.5 19V19C13.3338 19 14.0098 18.324 14.0098 17.4902V14.0583C14.0098 13.6197 14.154 13.1933 14.4201 12.8447L18.5 7.5"
+        stroke="currentColor"
+    />
+
+    <rect
+        x="0.5"
+        y="-0.5"
+        width="14"
+        height="2"
+        rx="1"
+        transform="matrix(1 0 0 -1 5 7)"
+        stroke="currentColor"
+    />
+</svg>

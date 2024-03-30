@@ -2,22 +2,27 @@
 div(
     :class=`{
       'v-input': true,
+      'v-input_dense': dense,
       'v-input_focused': focused,
     }`
     @click="$refs.input.focus()"
 )
-    input.v-input__input(
-        :id="id"
-        ref="input"
-        :type="type"
-        :value="value"
-        :placeholder="placeholder"
-        :readonly="readonly"
-        :disabled="disabled"
-        @input="onInput"
-        @focus="focused = true"
-        @blur="focused = false"
-    )
+    div.v-input__state
+    div.v-input__content
+        input.v-input__input(
+            :id="id"
+            ref="input"
+            :type="type"
+            :value="value"
+            :placeholder="placeholder"
+            :readonly="readonly"
+            :disabled="disabled"
+            @input="onInput"
+            @focus="focused = true"
+            @blur="focused = false"
+        )
+        div.v-input__trailing(v-if="'trailing' in $slots")
+            slot(name="trailing")
 </template>
 
 <script lang="ts">
@@ -47,6 +52,11 @@ export default defineComponent({
     placeholder: {
       type: String,
       default: '',
+    },
+
+    dense: {
+      type: Boolean,
+      default: false,
     },
 
     readonly: {
@@ -81,18 +91,42 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+@import "../stylesheets/typography";
 @import "../stylesheets/variables";
 
 .v-input {
   display: inline-flex;
-  padding: 12px 28px 13px 28px;
   background: #{$zs-gray-button};
-  border: 1px solid transparent;
   border-radius: 6px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.25) inset;
+  position: relative;
 
-  &_focused {
+  &__state {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid transparent;
+    border-radius: inherit;
+    z-index: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  &_focused &__state {
     border-color: #{$zs-blue-dark};
+  }
+
+  &__content {
+    display: inline-flex;
+    width: 100%;
+    padding: 12px 20px 13px 20px;
+    border-radius: inherit;
+    z-index: 1;
+  }
+
+  &_dense &__content {
+    padding: 7px 10px 8px 10px;
   }
 
   &__input {
@@ -102,16 +136,31 @@ export default defineComponent({
     background: transparent;
     border: none;
     color: #{$zs-black};
-    font-family: "Graphik LCG", sans-serif;
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 25px;
+    @include text-basic;
     outline: none;
 
     &::placeholder {
       color: #{$zs-gray};
     }
+  }
+
+  &_dense &__input {
+    height: 15px;
+    line-height: normal;
+  }
+
+  &__trailing {
+    display: inline-flex;
+    width: 25px;
+    height: 25px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &_dense &__trailing {
+    width: 15px;
+    height: 15px;
   }
 }
 </style>

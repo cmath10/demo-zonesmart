@@ -14,6 +14,43 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+  place-items: center;
+  flex-direction: column;
+  background:
+    linear-gradient(0deg, #F2F2F2 0%, #F2F2F2 100%),
+    linear-gradient(0deg, rgba(30, 52, 71, 0.16) 0%, rgba(30, 52, 71, 0.16) 100%),
+    #{$zs-white}
+  ;
+  color: #{$zs-black};
+  margin: 0;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 100%;
+}
+
+h1 {
+  font-size: 42px;
+  font-weight: 600;
+  line-height: normal;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: normal;
+  margin-top: 0;
+}
+
 a {
   color: #{$zs-green};
   font-weight: 500;
@@ -21,36 +58,6 @@ a {
 }
 a:hover {
   color: #{$zs-green-saturated};
-}
-
-body {
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-  background:
-    linear-gradient(0deg, #F2F2F2 0%, #F2F2F2 100%),
-    linear-gradient(0deg, rgba(30, 52, 71, 0.16) 0%, rgba(30, 52, 71, 0.16) 100%),
-    #{$zs-white}
-  ;
-  margin: 0;
-}
-
-h1 {
-  color: #{$zs-black};
-  font-family: "Graphik LCG", sans-serif;
-  font-size: 42px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-  margin-top: 0;
-  margin-bottom: 20px;
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
 }
 
 label {
@@ -64,4 +71,12 @@ label {
   &[for] {
     cursor: pointer;
   }
+}
+
+.v-panel {
+  padding: 40px 40px 60px;
+  flex-shrink: 0;
+  background: #{$zs-white};
+  border-radius: 15px;
+  box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.16);
 }

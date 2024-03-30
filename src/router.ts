@@ -1,5 +1,5 @@
-import PageGoods from '@/pages/PageGoods.vue'
 import PageLogin from '@/pages/PageLogin.vue'
+import PageProducts from '@/pages/PageProducts.vue'
 
 import {
   createRouter,
@@ -14,7 +14,7 @@ const router = createRouter({
     {
       name: 'Home',
       path: '/',
-      component: PageGoods,
+      component: PageProducts,
     },
     {
       name: 'Login',

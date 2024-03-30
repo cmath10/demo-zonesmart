@@ -23,6 +23,7 @@ export const state = (): State => ({
 export const getters = {
   authenticated: state => state.user !== null,
   initialized: state => state.initialized,
+  user: state => state.user,
 } satisfies GetterTree<State, unknown>
 
 export const mutations = {
