@@ -73,6 +73,7 @@ export default defineComponent({
   emits: [
     'blur',
     'focus',
+    'input',
     'update:value',
   ],
 
@@ -84,6 +85,7 @@ export default defineComponent({
     onInput (event: InputEvent) {
       const input = event.target as HTMLInputElement
 
+      this.$emit('input', input.value)
       this.$emit('update:value', input.value)
     },
   },

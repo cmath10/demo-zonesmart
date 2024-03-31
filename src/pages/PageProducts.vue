@@ -41,9 +41,9 @@ div(:class="$style['container']")
                     tr
                         th
                             VCheckbox(
-                                :model="selected.length > 0 && selected.length === page.results.length"
-                                :indeterminate="selected.length > 0 && selected.length < page.results.length"
-                                @change="(checked: boolean) => selected = checked ? page.results.map(p => p.id) : []"
+                                :model="selected_all"
+                                :indeterminate="selected_some"
+                                @change="(checked: boolean) => selection = checked ? page.results.map(p => p.id) : []"
                             )
                         th Фото
                         th Артикул продавца
@@ -66,13 +66,13 @@ div(:class="$style['container']")
                         th Удалить
                 tbody
                     tr(
-                        v-if="selected.length"
+                        v-if="selection.length"
                         :class="$style['table__batch']"
                     )
                         td(colspan="5")
                             div(style="display: flex; align-items: center; gap: 10px;")
-                                | Выбрано {{ selected.length }} из {{ page.results.length }}
-                                VButton(appearance="secondary" dense @click="console.log([...selected])")
+                                | Выбрано {{ selection.length }} из {{ page.results.length }}
+                                VButton(appearance="secondary" dense @click="console.log([...selection])")
                                     template(#icon)
                                         IconTrashAlt
                                     | Удалить выбранные
@@ -80,13 +80,21 @@ div(:class="$style['container']")
                             | Для всех выделенных
                         td
                             VInput(
+                                :value="selection_min_price"
                                 :class="$style['product-price']"
+                                inputmode="numeric"
+                                placeholder="\u20BD"
                                 dense
+                                @input=`applyMinPriceToSelection`
                             )
                         td
                             VInput(
+                                :value="selection_max_price"
                                 :class="$style['product-price']"
+                                inputmode="numeric"
+                                placeholder="\u20BD"
                                 dense
+                                @input="applyMaxPriceToSelection"
                             )
                         td
                     tr(
@@ -94,7 +102,7 @@ div(:class="$style['container']")
                         :key="product.id"
                     )
                         td
-                            VCheckbox(v-model:model="selected" :value="product.id")
+                            VCheckbox(v-model:model="selection" :value="product.id")
                         td
                             img(
                                 v-if="product.images[0]"
@@ -127,15 +135,21 @@ div(:class="$style['container']")
                         td {{ product.price }}
                         td
                             VInput(
-                                :value="product.min_price || 0"
+                                :value="product.min_price || ''"
                                 :class="$style['product-price']"
+                                inputmode="numeric"
+                                placeholder="\u20BD"
                                 dense
+                                @input=`(value: number | string) => applyMinPrice(product, value)`
                             )
                         td
                             VInput(
-                                :value="product.max_price || 0"
+                                :value="product.max_price || ''"
                                 :class="$style['product-price']"
+                                inputmode="numeric"
+                                placeholder="\u20BD"
                                 dense
+                                @input="(value: number | string) => applyMaxPrice(product, value)"
                             )
                         td
                             IconTrash(
@@ -177,6 +191,19 @@ import { defineComponent } from 'vue'
 import authRefresh from '@/api/authRefresh'
 import fetchProducts from '@/api/fetchProducts'
 
+const column = <O extends object, K extends keyof O>(d: O[], k: K): Set<O[K]> => {
+  return d.map(p => p[k])
+}
+const common = <T>(s: Set<T>) => s.size !== 1 ? '' : Array.from(s)[0] ?? ''
+const unique = <O extends object, K extends keyof O>(d: O[], k: K): Set<O[K]> => {
+  return new Set(column(d, k))
+}
+
+function filterInteger (value: number | string) {
+  const parsed = Number.parseInt(String(value))
+  return isNaN(parsed) ? null : parsed
+}
+
 export default defineComponent({
   name: 'PageProducts',
 
@@ -205,24 +232,77 @@ export default defineComponent({
       results: [],
     } as Page<Product>,
 
-    selected: [] as Product['id'][],
+    selection: [] as Product['id'][],
+    selection_max_price: '' as number | string,
+    selection_min_price: '' as number | string,
   }),
 
   computed: {
     user (): User | null {
       return this.$store.getters.user
     },
+
+    selected_all (): boolean {
+      return this.selection.length > 0 && this.selection.length === this.page.results.length
+    },
+
+    selected_some (): boolean {
+      return this.selection.length > 0 && this.selection.length < this.page.results.length
+    },
+
+    selected_product_list (): Product[] {
+      return this.page.results.filter(p => this.selection.includes(p.id))
+    },
+  },
+
+  watch: {
+    selection () {
+      this.selection_max_price = common(unique(this.selected_product_list, 'max_price'))
+      this.selection_min_price = common(unique(this.selected_product_list, 'min_price'))
+    },
   },
 
   async created () {
     await this.load(this.page_number)
     this.$watch(() => this.page_number, async () => {
-      this.selected = []
+      this.selection = []
       await this.load(this.page_number)
     })
   },
 
   methods: {
+    applyMaxPrice (product: Product, value: number | string) {
+      product.max_price = filterInteger(value)
+
+      const max_price_set = unique(this.selected_product_list, 'max_price')
+      if (max_price_set.size === 1) {
+        this.selection_max_price = product.max_price
+      }
+    },
+
+    applyMaxPriceToSelection (value: number | string) {
+      this.selection_max_price = filterInteger(value)
+      this.selected_product_list.forEach(product => {
+        product.max_price = this.selection_max_price
+      })
+    },
+
+    applyMinPrice (product: Product, value: number | string) {
+      product.min_price = filterInteger(value)
+
+      const min_price_set = unique(this.selected_product_list, 'min_price')
+      if (min_price_set.size === 1) {
+        this.selection_min_price = product.min_price
+      }
+    },
+
+    applyMinPriceToSelection (value: number | string) {
+      this.selection_min_price = filterInteger(value)
+      this.selected_product_list.forEach(product => {
+        product.min_price = this.selection_min_price
+      })
+    },
+
     async load (page_number: number) {
       return this.withAuthRefresh(async () => {
         this.page = await fetchProducts({
