@@ -59,74 +59,74 @@ import { defineComponent } from 'vue'
 import auth from '@/api/auth'
 
 export default defineComponent({
-  name: 'PageLogin',
+    name: 'PageLogin',
 
-  components: {
-    IconEye,
-    IconEyeClosed,
-    VButton,
-    VInput,
-  },
-
-  data: () => ({
-    email: '',
-    password: '',
-    password_hidden: true,
-    error: '',
-    redirecting: false,
-    submitting: false,
-  }),
-
-  computed: {
-    authenticated () {
-      return this.$store.getters.authenticated
+    components: {
+        IconEye,
+        IconEyeClosed,
+        VButton,
+        VInput,
     },
 
-    filled (): boolean {
-      return this.email.length > 0 && this.password.length > 0
+    data: () => ({
+        email: '',
+        password: '',
+        password_hidden: true,
+        error: '',
+        redirecting: false,
+        submitting: false,
+    }),
+
+    computed: {
+        authenticated () {
+            return this.$store.getters.authenticated
+        },
+
+        filled (): boolean {
+            return this.email.length > 0 && this.password.length > 0
+        },
     },
-  },
 
-  watch: {
-    async authenticated () {
-      if (this.authenticated) {
-        await this.$router.push({ name: 'Home' })
-      }
+    watch: {
+        async authenticated () {
+            if (this.authenticated) {
+                await this.$router.push({ name: 'Home' })
+            }
+        },
+
+        email () {
+            this.error = ''
+        },
+
+        password () {
+            this.error = ''
+        },
     },
 
-    email () {
-      this.error = ''
+    methods: {
+        async onSubmit (event: Event) {
+            event.preventDefault()
+
+            this.submitting = true
+
+            try {
+                this.$store.dispatch('SET_USER', await auth({
+                    email: this.email,
+                    password: this.password,
+                }))
+            } catch (e: unknown) {
+                if (e instanceof UnauthorizedHttpError) {
+                    this.error = e.message === 'No active account found with the given credentials'
+                        ? 'Для данной пары email/пароль не найден активный аккаунт'
+                        : e.message
+                } else {
+                    console.error(e)
+                }
+            } finally {
+                this.submitting = false
+            }
+        },
     },
-
-    password () {
-      this.error = ''
-    },
-  },
-
-  methods: {
-    async onSubmit (event: Event) {
-      event.preventDefault()
-
-      this.submitting = true
-
-      try {
-        this.$store.dispatch('SET_USER', await auth({
-          email: this.email,
-          password: this.password,
-        }))
-      } catch (e: unknown) {
-        if (e instanceof UnauthorizedHttpError) {
-          this.error = e.message === 'No active account found with the given credentials'
-            ? 'Для данной пары email/пароль не найден активный аккаунт'
-            : e.message
-        } else {
-          console.error(e)
-        }
-      } finally {
-        this.submitting = false
-      }
-    },
-  },
 })
 </script>
 

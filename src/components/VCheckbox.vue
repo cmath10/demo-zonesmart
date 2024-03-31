@@ -36,119 +36,119 @@ import IconIndeterminate from '@/sprites/checkbox/indeterminate.svg'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'VCheckbox',
+    name: 'VCheckbox',
 
-  components: {
-    IconCheckmark,
-    IconIndeterminate,
-  },
-
-  props: {
-    id: {
-      type: null as unknown as PropType<string | undefined>,
-      validator: (id: unknown) => id === undefined || typeof id === 'string' && id.length > 0 && /^[A-Za-z]/.test(id),
-      default: undefined,
+    components: {
+        IconCheckmark,
+        IconIndeterminate,
     },
 
-    name: {
-      type: null as unknown as PropType<string | undefined>,
-      validator: (id: unknown) => id === undefined || typeof id === 'string',
-      default: undefined,
+    props: {
+        id: {
+            type: null as unknown as PropType<string | undefined>,
+            validator: (id: unknown) => id === undefined || typeof id === 'string' && id.length > 0 && /^[A-Za-z]/.test(id),
+            default: undefined,
+        },
+
+        name: {
+            type: null as unknown as PropType<string | undefined>,
+            validator: (id: unknown) => id === undefined || typeof id === 'string',
+            default: undefined,
+        },
+
+        model: {
+            type: null as unknown as PropType<unknown>,
+            default: undefined as unknown,
+        },
+
+        value: {
+            type: null as unknown as PropType<unknown>,
+            default: undefined as unknown,
+        },
+
+        indeterminate: {
+            type: Boolean,
+            default: false,
+        },
+
+        invalid: {
+            type: Boolean,
+            default: false,
+        },
+
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+
+        true_value: {
+            type: null as unknown as PropType<unknown>,
+            default: true,
+        },
+
+        false_value: {
+            type: null as unknown as PropType<unknown>,
+            default: false,
+        },
+
+        equals_fn: {
+            type: Function as PropType<(a: unknown, b: unknown) => boolean>,
+            default: (a: unknown, b: unknown): boolean => a === b,
+        },
     },
 
-    model: {
-      type: null as unknown as PropType<unknown>,
-      default: undefined as unknown,
+    emits: [
+        'change',
+        'update:model',
+    ],
+
+    computed: {
+        checked (): boolean {
+            return Array.isArray(this.model)
+                ? this.contains(this.model, this.value)
+                : this.equals(this.model, this.true_value)
+        },
     },
 
-    value: {
-      type: null as unknown as PropType<unknown>,
-      default: undefined as unknown,
+    methods: {
+        click () {
+            (this.$refs.input as HTMLInputElement | undefined)?.click()
+        },
+
+        focus () {
+            (this.$refs.input as HTMLInputElement | undefined)?.focus()
+        },
+
+        blur () {
+            (this.$refs.input as HTMLInputElement | undefined)?.blur()
+        },
+
+        equals (a: unknown, b: unknown): boolean {
+            return this.equals_fn.call(null, a, b)
+        },
+
+        contains (array: unknown[], value: unknown): boolean {
+            return array.some(v => this.equals(v, value))
+        },
+
+        calculate (checked: boolean) {
+            if (Array.isArray(this.model)) {
+                return checked
+                    ? (this.contains(this.model, this.value) ? this.model : [...this.model, this.value])
+                    : [...this.model].filter(v => !this.equals(v, this.value))
+            }
+
+            return checked ? this.true_value : this.false_value
+        },
+
+        onChange (event: Event) {
+            const input = event.target as HTMLInputElement
+            const value = this.calculate(input.checked)
+
+            this.$emit('change', value)
+            this.$emit('update:model', value)
+        },
     },
-
-    indeterminate: {
-      type: Boolean,
-      default: false,
-    },
-
-    invalid: {
-      type: Boolean,
-      default: false,
-    },
-
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-
-    true_value: {
-      type: null as unknown as PropType<unknown>,
-      default: true,
-    },
-
-    false_value: {
-      type: null as unknown as PropType<unknown>,
-      default: false,
-    },
-
-    equals_fn: {
-      type: Function as PropType<(a: unknown, b: unknown) => boolean>,
-      default: (a: unknown, b: unknown): boolean => a === b,
-    },
-  },
-
-  emits: [
-    'change',
-    'update:model',
-  ],
-
-  computed: {
-    checked (): boolean {
-      return Array.isArray(this.model)
-        ? this.contains(this.model, this.value)
-        : this.equals(this.model, this.true_value)
-    },
-  },
-
-  methods: {
-    click () {
-      (this.$refs.input as HTMLInputElement | undefined)?.click()
-    },
-
-    focus () {
-      (this.$refs.input as HTMLInputElement | undefined)?.focus()
-    },
-
-    blur () {
-      (this.$refs.input as HTMLInputElement | undefined)?.blur()
-    },
-
-    equals (a: unknown, b: unknown): boolean {
-      return this.equals_fn.call(null, a, b)
-    },
-
-    contains (array: unknown[], value: unknown): boolean {
-      return array.some(v => this.equals(v, value))
-    },
-
-    calculate (checked: boolean) {
-      if (Array.isArray(this.model)) {
-        return checked
-          ? (this.contains(this.model, this.value) ? this.model : [...this.model, this.value])
-          : [...this.model].filter(v => !this.equals(v, this.value))
-      }
-
-      return checked ? this.true_value : this.false_value
-    },
-
-    onChange (event: Event) {
-      const input = event.target as HTMLInputElement
-      const value = this.calculate(input.checked)
-
-      this.$emit('change', value)
-      this.$emit('update:model', value)
-    },
-  },
 })
 </script>
 

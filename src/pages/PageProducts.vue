@@ -179,8 +179,8 @@ div(:class="$style['container']")
 <script lang="ts">
 import type { User } from '@/domain/user'
 import type {
-  Page,
-  Product,
+    Page,
+    Product,
 } from '@/api/fetchProducts'
 
 import IconCaret from '@/sprites/icons/caret.svg'
@@ -202,184 +202,184 @@ import authRefresh from '@/api/authRefresh'
 import fetchProducts from '@/api/fetchProducts'
 
 const column = <O extends object, K extends keyof O>(d: O[], k: K): Set<O[K]> => {
-  return d.map(p => p[k])
+    return d.map(p => p[k])
 }
 const common = <T>(s: Set<T>) => s.size !== 1 ? '' : Array.from(s)[0] ?? ''
 const unique = <O extends object, K extends keyof O>(d: O[], k: K): Set<O[K]> => {
-  return new Set(column(d, k))
+    return new Set(column(d, k))
 }
 
 function filterInteger (value: number | string) {
-  const parsed = Number.parseInt(String(value))
-  return isNaN(parsed) ? null : parsed
+    const parsed = Number.parseInt(String(value))
+    return isNaN(parsed) ? null : parsed
 }
 
 export default defineComponent({
-  name: 'PageProducts',
+    name: 'PageProducts',
 
-  components: {
-    IconCaret,
-    IconFilter,
-    IconLink,
-    IconTrash,
-    IconTrashAlt,
-    VButton,
-    VCheckbox,
-    VInput,
-    VInputSupportText,
-    VPagination,
-  },
-
-  data: () => ({
-    menu_opened: false,
-
-    page_number: 1,
-    page_size: 10,
-    page: {
-      count: 0,
-      next: null,
-      previous: null,
-      results: [],
-    } as Page<Product>,
-
-    selection: [] as Product['id'][],
-    selection_max_price: '' as number | string,
-    selection_min_price: '' as number | string,
-  }),
-
-  computed: {
-    user (): User | null {
-      return this.$store.getters.user
+    components: {
+        IconCaret,
+        IconFilter,
+        IconLink,
+        IconTrash,
+        IconTrashAlt,
+        VButton,
+        VCheckbox,
+        VInput,
+        VInputSupportText,
+        VPagination,
     },
 
-    selected_all (): boolean {
-      return this.selection.length > 0 && this.selection.length === this.page.results.length
+    data: () => ({
+        menu_opened: false,
+
+        page_number: 1,
+        page_size: 10,
+        page: {
+            count: 0,
+            next: null,
+            previous: null,
+            results: [],
+        } as Page<Product>,
+
+        selection: [] as Product['id'][],
+        selection_max_price: '' as number | string,
+        selection_min_price: '' as number | string,
+    }),
+
+    computed: {
+        user (): User | null {
+            return this.$store.getters.user
+        },
+
+        selected_all (): boolean {
+            return this.selection.length > 0 && this.selection.length === this.page.results.length
+        },
+
+        selected_some (): boolean {
+            return this.selection.length > 0 && this.selection.length < this.page.results.length
+        },
+
+        selected_product_list (): Product[] {
+            return this.page.results.filter(p => this.selection.includes(p.id))
+        },
     },
 
-    selected_some (): boolean {
-      return this.selection.length > 0 && this.selection.length < this.page.results.length
+    watch: {
+        selection () {
+            this.selection_max_price = common(unique(this.selected_product_list, 'max_price'))
+            this.selection_min_price = common(unique(this.selected_product_list, 'min_price'))
+        },
     },
 
-    selected_product_list (): Product[] {
-      return this.page.results.filter(p => this.selection.includes(p.id))
-    },
-  },
-
-  watch: {
-    selection () {
-      this.selection_max_price = common(unique(this.selected_product_list, 'max_price'))
-      this.selection_min_price = common(unique(this.selected_product_list, 'min_price'))
-    },
-  },
-
-  async created () {
-    await this.load(this.page_number)
-    this.$watch(() => this.page_number, async () => {
-      this.selection = []
-      await this.load(this.page_number)
-    })
-  },
-
-  mounted () {
-    const context = this as unknown as { __onGlobalClick?: (event: Event) => void }
-    context.__onGlobalClick = (event: Event) => {
-      const trigger = this.$refs.menu_trigger as HTMLElement | undefined
-      if (trigger?.contains(event.target as HTMLElement)) {
-        return
-      }
-
-      const popper = this.$refs.menu_popper as HTMLElement | undefined
-      if (!popper?.contains(event.target as HTMLElement)) {
-        this.menu_opened = false
-      }
-    }
-
-    window.addEventListener('click', context.__onGlobalClick)
-  },
-
-  beforeUnmount () {
-    const context = this as unknown as { __onGlobalClick?: (event: Event) => void }
-    if (context.__onGlobalClick) {
-      window.removeEventListener('click', context.__onGlobalClick)
-    }
-  },
-
-  methods: {
-    applyMaxPrice (product: Product, value: number | string) {
-      product.max_price = filterInteger(value)
-
-      const max_price_set = unique(this.selected_product_list, 'max_price')
-      if (max_price_set.size === 1) {
-        this.selection_max_price = product.max_price
-      }
-    },
-
-    applyMaxPriceToSelection (value: number | string) {
-      this.selection_max_price = filterInteger(value)
-      this.selected_product_list.forEach(product => {
-        product.max_price = this.selection_max_price
-      })
-    },
-
-    applyMinPrice (product: Product, value: number | string) {
-      product.min_price = filterInteger(value)
-
-      const min_price_set = unique(this.selected_product_list, 'min_price')
-      if (min_price_set.size === 1) {
-        this.selection_min_price = product.min_price
-      }
-    },
-
-    applyMinPriceToSelection (value: number | string) {
-      this.selection_min_price = filterInteger(value)
-      this.selected_product_list.forEach(product => {
-        product.min_price = this.selection_min_price
-      })
-    },
-
-    async load (page_number: number) {
-      return this.withAuthRefresh(async () => {
-        this.page = await fetchProducts({
-          access: this.user.access,
-          offset: (page_number - 1) * this.page_size,
-          limit: this.page_size,
+    async created () {
+        await this.load(this.page_number)
+        this.$watch(() => this.page_number, async () => {
+            this.selection = []
+            await this.load(this.page_number)
         })
-      })
     },
 
-    async authRefresh () {
-      await this.$store.dispatch('SET_USER', {
-        ...this.user,
-        access: await authRefresh(this.user.refresh),
-      })
-    },
-
-    async withAuthRefresh <T>(operation: () => Promise<T>): Promise<T> {
-      try {
-        return await operation()
-      } catch (e) {
-        if (e instanceof UnauthorizedHttpError) {
-          try {
-            await this.authRefresh()
-            return await operation()
-          } catch (e: unknown) {
-            if (e instanceof UnauthorizedHttpError) {
-              await this.logout()
-              return
+    mounted () {
+        const context = this as unknown as { __onGlobalClick?: (event: Event) => void }
+        context.__onGlobalClick = (event: Event) => {
+            const trigger = this.$refs.menu_trigger as HTMLElement | undefined
+            if (trigger?.contains(event.target as HTMLElement)) {
+                return
             }
 
-            throw e
-          }
+            const popper = this.$refs.menu_popper as HTMLElement | undefined
+            if (!popper?.contains(event.target as HTMLElement)) {
+                this.menu_opened = false
+            }
         }
 
-        throw e
-      }
+        window.addEventListener('click', context.__onGlobalClick)
     },
 
-    async logout () {
-      await this.$store.dispatch('UNSET_USER')
+    beforeUnmount () {
+        const context = this as unknown as { __onGlobalClick?: (event: Event) => void }
+        if (context.__onGlobalClick) {
+            window.removeEventListener('click', context.__onGlobalClick)
+        }
     },
-  },
+
+    methods: {
+        applyMaxPrice (product: Product, value: number | string) {
+            product.max_price = filterInteger(value)
+
+            const max_price_set = unique(this.selected_product_list, 'max_price')
+            if (max_price_set.size === 1) {
+                this.selection_max_price = product.max_price
+            }
+        },
+
+        applyMaxPriceToSelection (value: number | string) {
+            this.selection_max_price = filterInteger(value)
+            this.selected_product_list.forEach(product => {
+                product.max_price = this.selection_max_price
+            })
+        },
+
+        applyMinPrice (product: Product, value: number | string) {
+            product.min_price = filterInteger(value)
+
+            const min_price_set = unique(this.selected_product_list, 'min_price')
+            if (min_price_set.size === 1) {
+                this.selection_min_price = product.min_price
+            }
+        },
+
+        applyMinPriceToSelection (value: number | string) {
+            this.selection_min_price = filterInteger(value)
+            this.selected_product_list.forEach(product => {
+                product.min_price = this.selection_min_price
+            })
+        },
+
+        async load (page_number: number) {
+            return this.withAuthRefresh(async () => {
+                this.page = await fetchProducts({
+                    access: this.user.access,
+                    offset: (page_number - 1) * this.page_size,
+                    limit: this.page_size,
+                })
+            })
+        },
+
+        async authRefresh () {
+            await this.$store.dispatch('SET_USER', {
+                ...this.user,
+                access: await authRefresh(this.user.refresh),
+            })
+        },
+
+        async withAuthRefresh <T>(operation: () => Promise<T>): Promise<T> {
+            try {
+                return await operation()
+            } catch (e) {
+                if (e instanceof UnauthorizedHttpError) {
+                    try {
+                        await this.authRefresh()
+                        return await operation()
+                    } catch (e: unknown) {
+                        if (e instanceof UnauthorizedHttpError) {
+                            await this.logout()
+                            return
+                        }
+
+                        throw e
+                    }
+                }
+
+                throw e
+            }
+        },
+
+        async logout () {
+            await this.$store.dispatch('UNSET_USER')
+        },
+    },
 })
 </script>
 

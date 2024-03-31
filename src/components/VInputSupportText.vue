@@ -7,7 +7,7 @@ div.v-input-support-text
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'VInputSupportText',
+    name: 'VInputSupportText',
 })
 </script>
 

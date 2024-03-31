@@ -17,19 +17,19 @@ button(
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'VPaginationButton',
+    name: 'VPaginationButton',
 
-  props: {
-    active: {
-      type: Boolean,
-      default: false,
-    },
+    props: {
+        active: {
+            type: Boolean,
+            default: false,
+        },
 
-    disabled: {
-      type: Boolean,
-      default: false,
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
     },
-  },
 })
 </script>
 

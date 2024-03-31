@@ -39,7 +39,7 @@ module.exports = {
       imports: 'always-multiline',
       objects: 'always-multiline',
     }],
-    'indent': ['error', 2, {
+    'indent': ['error', 4, {
       ignoreComments: true,
       SwitchCase: 1,
     }],

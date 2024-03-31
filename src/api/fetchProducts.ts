@@ -32,37 +32,37 @@ export interface Page<T> {
 }
 
 export function getUrl ({
-  offset = 0,
-  limit = 10,
+    offset = 0,
+    limit = 10,
 }: Pagination) {
-  const url = new URL('https://dev-ar.zonesmart.com/api/product/')
+    const url = new URL('https://dev-ar.zonesmart.com/api/product/')
 
-  if (offset > 0) {
-    url.searchParams.append('offset', String(offset))
-  }
+    if (offset > 0) {
+        url.searchParams.append('offset', String(offset))
+    }
 
-  url.searchParams.append('limit', String(limit))
+    url.searchParams.append('limit', String(limit))
 
-  return String(url)
+    return String(url)
 }
 
 export default async ({
-  access,
-  offset = 0,
-  limit = 10,
+    access,
+    offset = 0,
+    limit = 10,
 }: Input): Promise<Page<Product>> => {
-  try {
-    const response = await axios.get<Page<Product>>(getUrl({
-      offset,
-      limit,
-    }), {
-      headers: {
-        authorization: `JWT ${access}`,
-      },
-    })
+    try {
+        const response = await axios.get<Page<Product>>(getUrl({
+            offset,
+            limit,
+        }), {
+            headers: {
+                authorization: `JWT ${access}`,
+            },
+        })
 
-    return response.data
-  } catch (e: unknown) {
-    throw processError(e)
-  }
+        return response.data
+    } catch (e: unknown) {
+        throw processError(e)
+    }
 }

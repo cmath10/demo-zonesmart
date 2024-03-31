@@ -22,29 +22,29 @@ import type { PropType } from 'vue'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'VButton',
+    name: 'VButton',
 
-  props: {
-    appearance: {
-      type: String as PropType<'primary' | 'secondary'>,
-      default: 'primary',
-    },
+    props: {
+        appearance: {
+            type: String as PropType<'primary' | 'secondary'>,
+            default: 'primary',
+        },
 
-    type: {
-      type: String as PropType<HTMLButtonElement['type']>,
-      default: 'button',
-    },
+        type: {
+            type: String as PropType<HTMLButtonElement['type']>,
+            default: 'button',
+        },
 
-    dense: {
-      type: Boolean,
-      default: false,
-    },
+        dense: {
+            type: Boolean,
+            default: false,
+        },
 
-    disabled: {
-      type: Boolean,
-      default: false,
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
     },
-  },
 })
 </script>
 

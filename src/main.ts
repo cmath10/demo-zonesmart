@@ -18,11 +18,11 @@ import router from './router'
 import store from './store'
 
 db.get().then(user => {
-  if (user) {
-    store.commit('SET_USER', user)
-  }
+    if (user) {
+        store.commit('SET_USER', user)
+    }
 
-  store.commit('SET_INITIALIZED', true)
+    store.commit('SET_INITIALIZED', true)
 })
 
 const app = createApp(App)
@@ -31,10 +31,10 @@ app.use(router)
 app.use(store)
 
 app.mount('#app').$watch(() => [
-  store.getters.authenticated,
-  store.getters.initialized,
+    store.getters.authenticated,
+    store.getters.initialized,
 ], async () => {
-  if (!store.getters.authenticated && store.getters.initialized) {
-    await router.push({ name: 'Login' })
-  }
+    if (!store.getters.authenticated && store.getters.initialized) {
+        await router.push({ name: 'Login' })
+    }
 }, { immediate: true })

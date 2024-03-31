@@ -36,71 +36,71 @@ import { defineComponent } from 'vue'
 const max_button_count = 5
 
 function isNotNegativeInteger (value: number): boolean {
-  return Number.isInteger(value) && value >= 0
+    return Number.isInteger(value) && value >= 0
 }
 
 export default defineComponent({
-  name: 'VPagination',
+    name: 'VPagination',
 
-  components: {
-    IconChevronLeft,
-    VPaginationButton,
-  },
-
-  props: {
-    total_count: {
-      type: Number,
-      validator: isNotNegativeInteger,
-      required: true,
+    components: {
+        IconChevronLeft,
+        VPaginationButton,
     },
 
-    page_number: {
-      type: Number,
-      validator: (value: number) => isNotNegativeInteger(value) && value >= 1,
-      default: 1,
+    props: {
+        total_count: {
+            type: Number,
+            validator: isNotNegativeInteger,
+            required: true,
+        },
+
+        page_number: {
+            type: Number,
+            validator: (value: number) => isNotNegativeInteger(value) && value >= 1,
+            default: 1,
+        },
+
+        page_size: {
+            type: Number,
+            validator: isNotNegativeInteger,
+            default: 10,
+        },
     },
 
-    page_size: {
-      type: Number,
-      validator: isNotNegativeInteger,
-      default: 10,
-    },
-  },
+    emits: [
+        'update:page_number',
+    ],
 
-  emits: [
-    'update:page_number',
-  ],
+    computed: {
+        total_page_count (): number {
+            return Math.ceil(this.total_count / this.page_size)
+        },
 
-  computed: {
-    total_page_count (): number {
-      return Math.ceil(this.total_count / this.page_size)
-    },
+        button_count (): number {
+            return Math.min(this.total_page_count, max_button_count)
+        },
 
-    button_count (): number {
-      return Math.min(this.total_page_count, max_button_count)
-    },
-
-    button_structure (): ({
+        button_structure (): ({
       before: number;
       after: number;
     }) {
-      const around = this.button_count - 1
-      const before = Math.min(Math.ceil(around / 2), this.page_number - 1)
-      const after = around - before
+            const around = this.button_count - 1
+            const before = Math.min(Math.ceil(around / 2), this.page_number - 1)
+            const after = around - before
 
-      return { before, after }
-    },
-  },
-
-  methods: {
-    prev (offset: number) {
-      this.$emit('update:page_number', Math.max(this.page_number - offset, 0))
+            return { before, after }
+        },
     },
 
-    next (offset: number) {
-      this.$emit('update:page_number', Math.min(this.page_number + offset, this.total_page_count))
+    methods: {
+        prev (offset: number) {
+            this.$emit('update:page_number', Math.max(this.page_number - offset, 0))
+        },
+
+        next (offset: number) {
+            this.$emit('update:page_number', Math.min(this.page_number + offset, this.total_page_count))
+        },
     },
-  },
 })
 </script>
 

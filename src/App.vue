@@ -7,10 +7,10 @@ template(v-else) Инициализация...
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  computed: {
-    initialized (): boolean {
-      return this.$store.getters.initialized
+    computed: {
+        initialized (): boolean {
+            return this.$store.getters.initialized
+        },
     },
-  },
 })
 </script>

@@ -31,64 +31,64 @@ import type { PropType } from 'vue'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'VInput',
+    name: 'VInput',
 
-  props: {
-    id: {
-      type: null as PropType<string | null>,
-      default: null,
+    props: {
+        id: {
+            type: null as PropType<string | null>,
+            default: null,
+        },
+
+        type: {
+            type: String as PropType<HTMLInputElement['type']>,
+            default: 'text',
+        },
+
+        value: {
+            type: [Number, String],
+            default: '',
+        },
+
+        placeholder: {
+            type: String,
+            default: '',
+        },
+
+        dense: {
+            type: Boolean,
+            default: false,
+        },
+
+        readonly: {
+            type: Boolean,
+            default: false,
+        },
+
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
     },
 
-    type: {
-      type: String as PropType<HTMLInputElement['type']>,
-      default: 'text',
+    emits: [
+        'blur',
+        'focus',
+        'input',
+        'update:value',
+    ],
+
+    data: () => ({
+        focused: false,
+    }),
+
+    methods: {
+        onInput (event: InputEvent) {
+            const input = event.target as HTMLInputElement
+
+            this.$emit('input', input.value)
+            this.$emit('update:value', input.value)
+        },
     },
-
-    value: {
-      type: [Number, String],
-      default: '',
-    },
-
-    placeholder: {
-      type: String,
-      default: '',
-    },
-
-    dense: {
-      type: Boolean,
-      default: false,
-    },
-
-    readonly: {
-      type: Boolean,
-      default: false,
-    },
-
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-  },
-
-  emits: [
-    'blur',
-    'focus',
-    'input',
-    'update:value',
-  ],
-
-  data: () => ({
-    focused: false,
-  }),
-
-  methods: {
-    onInput (event: InputEvent) {
-      const input = event.target as HTMLInputElement
-
-      this.$emit('input', input.value)
-      this.$emit('update:value', input.value)
-    },
-  },
 })
 </script>
 

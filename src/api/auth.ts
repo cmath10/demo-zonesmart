@@ -7,17 +7,17 @@ export default async (data: {
   email: string;
   password: string;
 }): Promise<User> => {
-  try {
-    const response = await axios.post<{
+    try {
+        const response = await axios.post<{
       access: string;
       refresh: string;
     }>('https://dev-ar.zonesmart.com/api/user/jwt/create/', data)
 
-    return {
-      email: data.email,
-      ...response.data,
+        return {
+            email: data.email,
+            ...response.data,
+        }
+    } catch (e: unknown) {
+        throw processError(e)
     }
-  } catch (e: unknown) {
-    throw processError(e)
-  }
 }
