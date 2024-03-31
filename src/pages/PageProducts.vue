@@ -149,7 +149,7 @@ div(:class="$style['container']")
                                 :value="product.min_price || ''"
                                 :class="$style['product-price']"
                                 inputmode="numeric"
-                                placeholder="\u20BD"
+                                placeholder="₽"
                                 dense
                                 @input=`(value: number | string) => applyMinPrice(product, value)`
                             )
@@ -158,7 +158,7 @@ div(:class="$style['container']")
                                 :value="product.max_price || ''"
                                 :class="$style['product-price']"
                                 inputmode="numeric"
-                                placeholder="\u20BD"
+                                placeholder="₽"
                                 dense
                                 @input="(value: number | string) => applyMaxPrice(product, value)"
                             )
