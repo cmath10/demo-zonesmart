@@ -1,13 +1,24 @@
 <template lang="pug">
 div(:class="$style['top']")
-    a(
-        href="javascript:void(0)"
-        style="margin-left: auto;"
-        @click="logout"
-    ) Выйти
-
-    span(:class="$style['menu']") {{ user?.email }}
-        IconCaret(:class="$style['menu__caret']")
+    div(:class="$style['menu']")
+        div(
+            ref="menu_trigger"
+            :class="$style['menu__trigger']"
+            @click="menu_opened = !menu_opened"
+        )
+            | {{ user?.email }}
+            IconCaret(:class="$style['menu__caret']")
+        div(
+            ref="menu_popper"
+            :class=`{
+                [$style['menu__popper']]: true,
+                [$style['menu__popper_shown']]: menu_opened,
+            }`
+        )
+            div(
+                :class="$style['menu__item']"
+                @click="logout"
+            ) Выйти
 
 div(:class="$style['container']")
     div.v-panel(:class="$style['panel']")
@@ -221,7 +232,7 @@ export default defineComponent({
   },
 
   data: () => ({
-    checked: false,
+    menu_opened: false,
 
     page_number: 1,
     page_size: 10,
@@ -268,6 +279,30 @@ export default defineComponent({
       this.selection = []
       await this.load(this.page_number)
     })
+  },
+
+  mounted () {
+    const context = this as unknown as { __onGlobalClick?: (event: Event) => void }
+    context.__onGlobalClick = (event: Event) => {
+      const trigger = this.$refs.menu_trigger as HTMLElement | undefined
+      if (trigger?.contains(event.target as HTMLElement)) {
+        return
+      }
+
+      const popper = this.$refs.menu_popper as HTMLElement | undefined
+      if (!popper?.contains(event.target as HTMLElement)) {
+        this.menu_opened = false
+      }
+    }
+
+    window.addEventListener('click', context.__onGlobalClick)
+  },
+
+  beforeUnmount () {
+    const context = this as unknown as { __onGlobalClick?: (event: Event) => void }
+    if (context.__onGlobalClick) {
+      window.removeEventListener('click', context.__onGlobalClick)
+    }
   },
 
   methods: {
@@ -368,16 +403,50 @@ export default defineComponent({
   display: inline-flex;
   place-items: center;
   position: relative;
-  cursor: pointer;
+  margin-left: auto;
 
-  &:hover &__caret {
-    opacity: 0.8;
+  &__trigger {
+    display: flex;
+    gap: 4px;
+    cursor: pointer;
+  }
+
+  &__trigger:hover &__caret {
+    color: #{$zs-green};
+  }
+
+  &__item {
+    display: flex;
+    width: 100%;
+    padding: 8px 20px 7px 20px;
+    flex-shrink: 0;
+    align-items: center;
+    cursor: pointer;
+
+    &:hover {
+      background: linear-gradient(0deg, #{$zs-pressed} 0%, #{$zs-pressed} 100%), #{$zs-gray-button};
+    }
   }
 
   &__popper {
+    width: 100%;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    background: #{$zs-white};
+    border-radius: 15px;
+    box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.16);
+    opacity: 0;
     visibility: hidden;
+    transition:
+        opacity 0.3s ease-out,
+        visibility 0.3s ease-out
+    ;
+    position: absolute;
+    left: 0;
+    top: 100%;
 
     &_shown {
+      opacity: 1;
       visibility: visible;
     }
   }
