@@ -35,8 +35,8 @@ import { defineComponent } from 'vue'
 
 const max_button_count = 5
 
-function isPositiveInteger (value: number): boolean {
-  return Number.isInteger(value) && value > 0
+function isNotNegativeInteger (value: number): boolean {
+  return Number.isInteger(value) && value >= 0
 }
 
 export default defineComponent({
@@ -50,19 +50,19 @@ export default defineComponent({
   props: {
     total_count: {
       type: Number,
-      validator: isPositiveInteger,
+      validator: isNotNegativeInteger,
       required: true,
     },
 
     page_number: {
       type: Number,
-      validator: (value: number) => isPositiveInteger(value) && value >= 1,
+      validator: (value: number) => isNotNegativeInteger(value) && value >= 1,
       default: 1,
     },
 
     page_size: {
       type: Number,
-      validator: isPositiveInteger,
+      validator: isNotNegativeInteger,
       default: 10,
     },
   },
