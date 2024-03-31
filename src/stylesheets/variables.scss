@@ -9,3 +9,6 @@ $zs-black: var(--zs-black, #000000);
 $zs-gray: var(--zs-gray, #999999);
 $zs-gray-button: var(--zs-gray-button, #F2F1F3);
 $zs-white: var(--zs-white, #FFFFFF);
+
+$zs-hovered: var(--zs-hovered, rgba(0, 0, 0, 0.05));
+$zs-pressed: var(--zs-pressed, rgba(0, 0, 0, 0.10));

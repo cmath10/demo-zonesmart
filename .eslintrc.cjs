@@ -22,11 +22,6 @@ module.exports = {
     process: true,
   },
   rules: {
-    '@typescript-eslint/naming-convention': [
-      'error',
-      { selector: 'variable', format: ['snake_case'] },
-      { selector: ['function', 'method'], format: ['camelCase'] },
-    ],
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-inferrable-types': 'off',

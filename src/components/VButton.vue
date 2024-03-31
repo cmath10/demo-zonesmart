@@ -51,9 +51,6 @@ export default defineComponent({
 <style lang="scss">
 @import "../stylesheets/variables";
 
-$hovered: var(--v-button-hovered, rgba(0, 0, 0, 0.05));
-$pressed: var(--v-button-pressed, rgba(0, 0, 0, 0.10));
-
 .v-button {
   display: inline-flex;
   padding: 0;
@@ -92,11 +89,11 @@ $pressed: var(--v-button-pressed, rgba(0, 0, 0, 0.10));
   }
 
   &:hover &__state {
-    background: linear-gradient(0deg, #{$hovered} 0%, #{$hovered} 100%);
+    background: linear-gradient(0deg, #{$zs-hovered} 0%, #{$zs-hovered} 100%);
   }
 
   &:active &__state {
-    background: linear-gradient(0deg, #{$pressed} 0%, #{$pressed} 100%);
+    background: linear-gradient(0deg, #{$zs-pressed} 0%, #{$zs-pressed} 100%);
   }
 
   &[disabled] &__state {

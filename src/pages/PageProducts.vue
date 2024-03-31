@@ -41,9 +41,9 @@ div(:class="$style['container']")
                     tr
                         th
                             VCheckbox(
-                                :model="selected.length > 0 && selected.length === products.results.length"
-                                :indeterminate="selected.length > 0 && selected.length < products.results.length"
-                                @change="(checked: boolean) => selected = checked ? products.results.map(p => p.id) : []"
+                                :model="selected.length > 0 && selected.length === page.results.length"
+                                :indeterminate="selected.length > 0 && selected.length < page.results.length"
+                                @change="(checked: boolean) => selected = checked ? page.results.map(p => p.id) : []"
                             )
                         th Фото
                         th Артикул продавца
@@ -71,7 +71,7 @@ div(:class="$style['container']")
                     )
                         td(colspan="5")
                             div(style="display: flex; align-items: center; gap: 10px;")
-                                | Выбрано {{ selected.length }} из {{ products.results.length }}
+                                | Выбрано {{ selected.length }} из {{ page.results.length }}
                                 VButton(appearance="secondary" dense @click="console.log([...selected])")
                                     template(#icon)
                                         IconTrashAlt
@@ -90,7 +90,7 @@ div(:class="$style['container']")
                             )
                         td
                     tr(
-                        v-for="product in products.results"
+                        v-for="product in page.results"
                         :key="product.id"
                     )
                         td
@@ -101,6 +101,13 @@ div(:class="$style['container']")
                                 :src="product.images[0]"
                                 :class="$style['product-image']"
                                 alt="Фото"
+                            )
+                            img(
+                                v-else
+                                :class="$style['product-image']"
+                                src="/no-image-128x128.png"
+                                alt="Фото отсутствует"
+                                title="Фото отсутствует"
                             )
                         td
                             a(
@@ -136,6 +143,13 @@ div(:class="$style['container']")
                                 aria-label="Удалить"
                                 role="button"
                             )
+
+        VPagination(
+            v-model:page_number="page_number"
+            :page_size="page_size"
+            :total_count="page.count"
+            :class="$style['pagination']"
+        )
 </template>
 
 <script lang="ts">
@@ -154,6 +168,7 @@ import VButton from '@/components/VButton.vue'
 import VCheckbox from '@/components/VCheckbox.vue'
 import VInput from '@/components/VInput.vue'
 import VInputSupportText from '@/components/VInputSupportText.vue'
+import VPagination from '@/components/VPagination.vue'
 
 import UnauthorizedHttpError from '@/api/UnauthorizedHttpError'
 
@@ -175,19 +190,22 @@ export default defineComponent({
     VCheckbox,
     VInput,
     VInputSupportText,
+    VPagination,
   },
 
   data: () => ({
     checked: false,
 
-    products: {
+    page_number: 1,
+    page_size: 10,
+    page: {
       count: 0,
       next: null,
       previous: null,
       results: [],
     } as Page<Product>,
 
-    selected: [],
+    selected: [] as Product['id'][],
   }),
 
   computed: {
@@ -197,29 +215,24 @@ export default defineComponent({
   },
 
   async created () {
-    try {
-      await this.fetchProducts()
-    } catch (e: unknown) {
-      if (e instanceof UnauthorizedHttpError) {
-        try {
-          await this.authRefresh()
-          await this.fetchProducts()
-          return
-        } catch (e: unknown) {
-          if (e instanceof UnauthorizedHttpError) {
-            await this.logout()
-            return
-          }
-
-          throw e
-        }
-      }
-
-      throw e
-    }
+    await this.load(this.page_number)
+    this.$watch(() => this.page_number, async () => {
+      this.selected = []
+      await this.load(this.page_number)
+    })
   },
 
   methods: {
+    async load (page_number: number) {
+      return this.withAuthRefresh(async () => {
+        this.page = await fetchProducts({
+          access: this.user.access,
+          offset: (page_number - 1) * this.page_size,
+          limit: this.page_size,
+        })
+      })
+    },
+
     async authRefresh () {
       await this.$store.dispatch('SET_USER', {
         ...this.user,
@@ -227,10 +240,26 @@ export default defineComponent({
       })
     },
 
-    async fetchProducts () {
-      this.products = await fetchProducts({
-        access: this.user.access,
-      })
+    async withAuthRefresh <T>(operation: () => Promise<T>): Promise<T> {
+      try {
+        return await operation()
+      } catch (e) {
+        if (e instanceof UnauthorizedHttpError) {
+          try {
+            await this.authRefresh()
+            return await operation()
+          } catch (e: unknown) {
+            if (e instanceof UnauthorizedHttpError) {
+              await this.logout()
+              return
+            }
+
+            throw e
+          }
+        }
+
+        throw e
+      }
     },
 
     async logout () {
@@ -375,5 +404,9 @@ export default defineComponent({
   &_danger:hover {
     color: #{$zs-red};
   }
+}
+
+.pagination {
+  margin-top: 20px;
 }
 </style>
