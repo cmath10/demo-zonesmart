@@ -110,7 +110,7 @@ export default defineComponent({
             this.submitting = true
 
             try {
-                this.$store.dispatch('SET_USER', await auth({
+                await this.$store.dispatch('SET_USER', await auth({
                     email: this.email,
                     password: this.password,
                 }))
