@@ -46,134 +46,142 @@ div(:class="$style['container']")
                 div(:style="{ flexShrink: 0 }")
                     VButton Добавить
 
-        div(:class="$style['table-wrapper']")
-            table(:class="$style['table']")
-                thead
-                    tr
-                        th
-                            VCheckbox(
-                                :model="selected_all"
-                                :indeterminate="selected_some"
-                                @change="(checked: boolean) => selection = checked ? page.results.map(p => p.id) : []"
-                            )
-                        th Фото
-                        th Артикул продавца
-                        th
-                            | Бренд
-                            IconFilter(:class="$style['icon-button']")
-                        th(style="max-width: 360px;") Название
-                        th
-                            | Остаток, шт.
-                            IconCaret(:class="$style['icon-button']")
-                        th
-                            | Текущая цена
-                            IconCaret(:class="$style['icon-button']")
-                        th
-                            | Минимальная цена
-                            IconCaret(:class="$style['icon-button']")
-                        th
-                            | Максимальная цена
-                            IconCaret(:class="$style['icon-button']")
-                        th Удалить
-                tbody
-                    tr(
-                        v-if="selection.length"
-                        :class="$style['table__batch']"
-                    )
-                        td(colspan="5")
-                            div(style="display: flex; align-items: center; gap: 10px;")
-                                | Выбрано {{ selection.length }} из {{ page.results.length }}
-                                VButton(appearance="secondary" dense @click="console.log([...selection])")
-                                    template(#icon)
-                                        IconTrashAlt
-                                    | Удалить выбранные
-                        td(colspan="2" style="text-align: right;")
-                            | Для всех выделенных
-                        td
-                            VInput(
-                                :value="selection_min_price"
-                                :class="$style['product-price']"
-                                inputmode="numeric"
-                                placeholder="\u20BD"
-                                dense
-                                @input=`applyMinPriceToSelection`
-                            )
-                        td
-                            VInput(
-                                :value="selection_max_price"
-                                :class="$style['product-price']"
-                                inputmode="numeric"
-                                placeholder="\u20BD"
-                                dense
-                                @input="applyMaxPriceToSelection"
-                            )
-                        td
-                    tr(
-                        v-for="product in page.results"
-                        :key="product.id"
-                    )
-                        td
-                            VCheckbox(v-model:model="selection" :value="product.id")
-                        td
-                            img(
-                                v-if="product.images[0]"
-                                :src="product.images[0]"
-                                :class="$style['product-image']"
-                                alt="Фото"
-                            )
-                            img(
-                                v-else
-                                :class="$style['product-image']"
-                                src="/no-image-128x128.png"
-                                alt="Фото отсутствует"
-                                title="Фото отсутствует"
-                            )
-                        td
-                            a(
-                                v-if="product.url"
-                                :href="product.url"
-                                :class="$style['icon-button']"
-                                target="_blank"
-                            )
-                                IconLink
-                            template(v-if="product.remote_id") {{ product.remote_id }}
-                            template(v-else) &mdash;
-                        td
-                            template(v-if="product.brand_name") {{ product.brand_name }}
-                            template(v-else) &mdash;
-                        td(style="max-width: 360px;") {{ product.title }}
-                        td {{ product.quantity }}
-                        td {{ product.price }}
-                        td
-                            VInput(
-                                :value="product.min_price || ''"
-                                :class="$style['product-price']"
-                                inputmode="numeric"
-                                placeholder="₽"
-                                dense
-                                @input=`(value: number | string) => applyMinPrice(product, value)`
-                            )
-                        td
-                            VInput(
-                                :value="product.max_price || ''"
-                                :class="$style['product-price']"
-                                inputmode="numeric"
-                                placeholder="₽"
-                                dense
-                                @input="(value: number | string) => applyMaxPrice(product, value)"
-                            )
-                        td
-                            IconTrash(
-                                :class="[$style['icon-button'], $style['icon-button_danger']]"
-                                aria-label="Удалить"
-                                role="button"
-                            )
+        template(v-if="!loading")
+            div(:class="$style['table-wrapper']")
+                table(:class="$style['table']")
+                    thead
+                        tr
+                            th
+                                VCheckbox(
+                                    :model="selected_all"
+                                    :indeterminate="selected_some"
+                                    @change="(checked: boolean) => selection = checked ? page.results.map(p => p.id) : []"
+                                )
+                            th Фото
+                            th Артикул продавца
+                            th
+                                | Бренд
+                                IconFilter(:class="$style['icon-button']")
+                            th(style="max-width: 360px;") Название
+                            th
+                                | Остаток, шт.
+                                IconCaret(:class="$style['icon-button']")
+                            th
+                                | Текущая цена
+                                IconCaret(:class="$style['icon-button']")
+                            th
+                                | Минимальная цена
+                                IconCaret(:class="$style['icon-button']")
+                            th
+                                | Максимальная цена
+                                IconCaret(:class="$style['icon-button']")
+                            th Удалить
+                    tbody
+                        tr(
+                            v-if="selection.length"
+                            :class="$style['table__batch']"
+                        )
+                            td(colspan="5")
+                                div(style="display: flex; align-items: center; gap: 10px;")
+                                    | Выбрано {{ selection.length }} из {{ page.results.length }}
+                                    VButton(appearance="secondary" dense @click="console.log([...selection])")
+                                        template(#icon)
+                                            IconTrashAlt
+                                        | Удалить выбранные
+                            td(colspan="2" style="text-align: right;")
+                                | Для всех выделенных
+                            td
+                                VInput(
+                                    :value="selection_min_price"
+                                    :class="$style['product-price']"
+                                    inputmode="numeric"
+                                    placeholder="\u20BD"
+                                    dense
+                                    @input=`applyMinPriceToSelection`
+                                )
+                            td
+                                VInput(
+                                    :value="selection_max_price"
+                                    :class="$style['product-price']"
+                                    inputmode="numeric"
+                                    placeholder="\u20BD"
+                                    dense
+                                    @input="applyMaxPriceToSelection"
+                                )
+                            td
+                        tr(
+                            v-for="product in page.results"
+                            :key="product.id"
+                        )
+                            td
+                                VCheckbox(v-model:model="selection" :value="product.id")
+                            td
+                                img(
+                                    v-if="product.images[0]"
+                                    :src="product.images[0]"
+                                    :class="$style['product-image']"
+                                    alt="Фото"
+                                )
+                                img(
+                                    v-else
+                                    :class="$style['product-image']"
+                                    src="/no-image-128x128.png"
+                                    alt="Фото отсутствует"
+                                    title="Фото отсутствует"
+                                )
+                            td
+                                a(
+                                    v-if="product.url"
+                                    :href="product.url"
+                                    :class="$style['icon-button']"
+                                    target="_blank"
+                                )
+                                    IconLink
+                                template(v-if="product.remote_id") {{ product.remote_id }}
+                                template(v-else) &mdash;
+                            td
+                                template(v-if="product.brand_name") {{ product.brand_name }}
+                                template(v-else) &mdash;
+                            td(style="max-width: 360px;") {{ product.title }}
+                            td {{ product.quantity }}
+                            td {{ product.price }}
+                            td
+                                VInput(
+                                    :value="product.min_price || ''"
+                                    :class="$style['product-price']"
+                                    inputmode="numeric"
+                                    placeholder="₽"
+                                    dense
+                                    @input=`(value: number | string) => applyMinPrice(product, value)`
+                                )
+                            td
+                                VInput(
+                                    :value="product.max_price || ''"
+                                    :class="$style['product-price']"
+                                    inputmode="numeric"
+                                    placeholder="₽"
+                                    dense
+                                    @input="(value: number | string) => applyMaxPrice(product, value)"
+                                )
+                            td
+                                IconTrash(
+                                    :class="[$style['icon-button'], $style['icon-button_danger']]"
+                                    aria-label="Удалить"
+                                    role="button"
+                                )
 
-        VPagination(
-            v-model:page_number="page_number"
-            :page_size="page_size"
-            :total_count="page.count"
+            VPagination(
+                v-model:page_number="page_number"
+                :page_size="page_size"
+                :total_count="page.count"
+            )
+
+        div(
+            v-else
+            :class="$style['indication']"
         )
+            div(:class="$style['spinner']")
+            | Идет загрузка
 </template>
 
 <script lang="ts">
@@ -245,6 +253,8 @@ export default defineComponent({
         selection: [] as Product['id'][],
         selection_max_price: '' as number | string,
         selection_min_price: '' as number | string,
+
+        loading: true,
     }),
 
     computed: {
@@ -338,13 +348,15 @@ export default defineComponent({
         },
 
         async load (page_number: number) {
-            return this.withAuthRefresh(async () => {
+            this.loading = true
+            await this.withAuthRefresh(async () => {
                 this.page = await fetchProducts({
                     access: this.user.access,
                     offset: (page_number - 1) * this.page_size,
                     limit: this.page_size,
                 })
             })
+            this.loading = false
         },
 
         async authRefresh () {
@@ -553,5 +565,24 @@ export default defineComponent({
   &_danger:hover {
     color: #{$zs-red};
   }
+}
+
+@keyframes spin {
+  to {transform: rotate(1turn);}
+}
+
+.spinner {
+  width: 25px;
+  height: 25px;
+  border: solid 4px;
+  border-color: #{$zs-green} #{$zs-green} #{$zs-green} white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.indication {
+  display: flex;
+  gap: 8px;
+  margin-top: 30px;
 }
 </style>
