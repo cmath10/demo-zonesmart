@@ -173,7 +173,6 @@ div(:class="$style['container']")
             v-model:page_number="page_number"
             :page_size="page_size"
             :total_count="page.count"
-            :class="$style['pagination']"
         )
 </template>
 
@@ -468,7 +467,6 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 30px;
 
   &__controls {
     display: flex;
@@ -482,6 +480,8 @@ export default defineComponent({
 
 .table-wrapper {
   overflow-x: auto;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 .table {
@@ -553,9 +553,5 @@ export default defineComponent({
   &_danger:hover {
     color: #{$zs-red};
   }
-}
-
-.pagination {
-  margin-top: 20px;
 }
 </style>
